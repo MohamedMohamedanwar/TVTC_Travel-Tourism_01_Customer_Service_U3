@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>محرك البحث</title>
+    <!-- <link
+      href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    /> -->
+    <style>
+      /*
+            @font-face {
+    font-family: 'DIN Next LT Arabic';
+    src: url('fonts/din-next-lt-arabic-regular.woff2') format('woff2'),
+         url('fonts/din-next-lt-arabic-regular.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'DIN Next LT Arabic';
+    src: url('fonts/din-next-lt-arabic-bold.woff2') format('woff2'),
+         url('fonts/din-next-lt-arabic-bold.woff') format('woff');
+    font-weight: 700;
+    font-style: normal;
+  }*/
+      :root {
+        --c-header: #2f5f73;
+        --c-bg: #2f6a7f;
+        --c-divider: rgba(255, 255, 255, 0.22);
+        --c-text: rgba(255, 255, 255, 0.92);
+        --c-search-bg: #e3edf0;
+        --c-search-left: #c9d3d7;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+          font-family: 'DIN Next LT Arabic', sans-serif;
+        direction: rtl;
+        margin: 0;
+       /* font-family: "Tajawal", Tahoma, Arial, sans-serif;*/
+        color: var(--c-text);
+        background: var(--c-bg);
+        user-select: none;
+      }
+
+      /* الهيدر */
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 5;
+        height: 56px;
+        display: grid;
+        grid-template-columns: 40px 1fr 40px;
+        align-items: center;
+        padding: 0 8px;
+        background: #1f3a64;
+        color: #fff;
+      }
+      .btn {
+        width: 36px;
+        height: 36px;
+        display: grid;
+        place-items: center;
+        border: none;
+        background: transparent;
+        color: #fff;
+        cursor: pointer;
+        border-radius: 8px;
+      }
+      .title {
+        text-align: center;
+        font-weight: 700;
+      }
+
+      /* البحث */
+      .searchWrap {
+        padding: 12px 10px;
+      }
+      .searchBox {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        max-width: 320px;
+        border-radius: 4px;
+        overflow: hidden;
+      }
+      .searchLeft {
+        width: 54px;
+        height: 40px;
+        background: var(--c-search-left);
+        display: grid;
+        place-items: center;
+        border: 1px solid rgba(0, 0, 0, 0.15);
+        border-inline-end: none;
+      }
+      .searchRight {
+        flex: 1;
+        height: 40px;
+        background: var(--c-search-bg);
+        border: 1px solid rgba(0, 0, 0, 0.15);
+        display: flex;
+        align-items: center;
+        padding: 0 10px;
+      }
+      .searchRight input {
+        all: unset;
+        flex: 1;
+        color: #1a2b32;
+        direction: rtl;
+      }
+      .results {
+        padding: 10px;
+      }
+      .res {
+        background: transparent;
+        border-bottom: 1px solid var(--c-divider);
+        padding: 10px 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .res:last-child {
+        border-bottom: none;
+      }
+      .res .icon {
+        width: 18px;
+        height: 18px;
+        color: #fff;
+      }
+      .res .label {
+        flex: 1;
+        color: #fff;
+      }
+      .hidden {
+        display: none !important;
+      }
+      mark {
+        background: #ffd54a;
+        color: #2b2b2b;
+        padding: 0 2px;
+        border-radius: 3px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- الهيدر -->
+    <div class="topbar">
+      <!-- زر إغلاق يسار -->
+      <button class="btn" id="btnClose" aria-label="إغلاق">
+        <svg
+          viewBox="0 0 24 24"
+          width="20"
+          height="20"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+        >
+          <path d="M18 6L6 18M6 6l12 12" />
+        </svg>
+      </button>
+      <!-- العنوان وسط -->
+      <div class="title">محرك البحث</div>
+      <!-- أيقونة بحث يمين -->
+      <button class="btn" aria-label="بحث">
+        <svg
+          viewBox="0 0 24 24"
+          width="20"
+          height="20"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+        >
+          <circle cx="11" cy="11" r="7"></circle>
+          <path d="M21 21l-3.5-3.5"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- صندوق البحث -->
+    <div class="searchWrap">
+      <div class="searchBox">
+        <div class="searchLeft">
+          <svg
+            viewBox="0 0 24 24"
+            width="18"
+            height="18"
+            fill="none"
+            stroke="#333"
+            stroke-width="2"
+            stroke-linecap="round"
+          >
+            <circle cx="11" cy="11" r="7"></circle>
+            <path d="M21 21l-3.5-3.5"></path>
+          </svg>
+        </div>
+        <label class="searchRight">
+          <input id="q" type="search" placeholder="ادخل كلمة البحث هنا ..." />
+        </label>
+      </div>
+    </div>
+
+    <!-- النتائج -->
+    <div id="results" class="results"></div>
+
+    <script>
+      /* عناصر القائمة */
+      const items = [
+        { key: "intro_unit", label: "مقدمة الوحدة" },
+        { key: "unit_goals", label: "أهداف الوحدة" },
+        { key: "quality_definition", title: "مفهوم مزيج التسويق للخدمات", items: [] },
+        
+        { key: "self_assess_1", label: "مقدمة" },
+        { key: "quality_expectations", label: "العناصر السبعة لمزيج التسويق للخدمات" },
+        { key: "quality_examples", label: "تطبيق العناصر السبعة لمزيج التسويق على الخدمات السياحية" },
+       /* { key: "quality_components", label: "تعزيز قيمة العلامة التجارية" },
+        { key: "self_assess_2", title: "طرق تطوير خدمة العملاء في السياحة", items: [] },*/
+
+        { key: "self_assess_2", label: "الأثر المالي لخدمة العملاء  " },
+        { key: "intro_service_success", label: "الأثر السلوكي لخدمة العملاء" },
+        { key: "business_success", label: "التبويب الأفقي" },
+        /*{ key: "self_assess_3", label: "استدلالات رقمية على دور الاقتصاد الخدمي في السياحة" },*/
+
+         { key: "word_of_mouth", title: "تقييم ذاتي", items: [] },
+         { key: "interactive_activity", title: "نشاط تفاعلي", items: [] },
+         { key: "unit_summary", title: "ملخص الوحدة", items: [] },
+         { key: "self_assess_4", title: "تمارين الوحدة", items: [] },
+
+  
+
+
+     /* { key: "self_assess_2", label: "أمثلة لتطبيقات خدمة العملاء في  السياحة" },
+
+
+        { key: "quality_examples", label: "التصنيفات الأخرى لوسائل خدمة العملاء" },
+        {
+          key: "quality_components",
+          label: "أهمية خدمة العملاء المتميزة في السياحة",
+        },
+        {
+          key: "self_assess_2",
+          label: "'أمثلة لتطبيقات خدمة العملاء في  السياحة",
+        },
+        { key: "business_success", label: "طرق تطوير خدمة العملاء في السياحة" },
+        { key: "intro_service_success", label: "التقييم الذاتي" },
+        { key: "interactive_activity", label: "نشاط تفاعلي" },
+        { key: "unit_summary", label: "ملخص الوحدة" },
+        {
+          key: "self_assess_3",
+          label: "تمارين الوحدة",
+        }
+        /*,
+        { key: "quality_stages_intro", label: "مقدمة مراحل تطور الجودة" },
+        { key: "self_assess_4", label: "التقييم الذاتي رقم 4" },
+        { key: "quality_scholars", label: "أهم علماء الجودة" },
+        { key: "traditional_quality", label: "الجودة التقليدية" },
+        { key: "quality_control", label: "رقابة الجودة" },
+        { key: "self_assess_5", label: "التقييم الذاتي رقم 5" },
+        { key: "quality_assurance", label: "ضمان الجودة" },
+        { key: "tqm", label: "إدارة الجودة الشاملة" },
+        { key: "interactive_activity", label: "نشاط تفاعلي" },
+        { key: "unit_summary", label: "ملخص الوحدة" },
+        { key: "self_assess_6", label: "التقييم الذاتي رقم 6" },*/
+      ];
+
+      /* تطبيع النصوص للبحث بالعربية */
+      const norm = (s) =>
+        (s || "")
+          .replace(/[\u064B-\u065F]/g, "")
+          .replace(/[إأآا]/g, "ا")
+          .replace(/ة/g, "ه")
+          .replace(/ى/g, "ي")
+          .replace(/[^\p{Letter}\p{Number}\s]/gu, " ")
+          .replace(/\s+/g, " ")
+          .trim();
+
+      const resBox = document.getElementById("results");
+      const q = document.getElementById("q");
+
+      function render(list, query = "") {
+        if (!list.length) {
+          resBox.innerHTML = "";
+          return;
+        }
+        const nq = norm(query);
+        const hi = (txt) => {
+          if (!nq) return txt;
+          try {
+            const rx = new RegExp(
+              "(" + nq.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + ")",
+              "gi"
+            );
+            return txt.replace(rx, "<mark>$1</mark>");
+          } catch (_) {
+            return txt;
+          }
+        };
+
+        resBox.innerHTML = list
+          .map(
+            (it) => `
+    <div class="res" data-key="${it.key}">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M12 7l7.5 3.75L12 14.5 4.5 10.75 12 7z"/>
+        <path d="M19.5 12.75L12 16.5 4.5 12.75M19.5 16.5L12 20.25 4.5 16.5"/>
+      </svg>
+      <div class="label">${hi(it.label)}</div>
+    </div>
+  `
+          )
+          .join("");
+
+        // عند الضغط على نتيجة
+        resBox.querySelectorAll(".res").forEach((el) => {
+          el.addEventListener("click", () => {
+            const key = el.getAttribute("data-key");
+            try {
+              parent.postMessage({ type: "extMenu:navigate", key }, "*");
+            } catch (e) {}
+            try {
+              parent.postMessage("extMenu:close", "*");
+            } catch (e) {}
+          });
+        });
+      }
+
+      /* البحث */
+      function doSearch() {
+        const query = q.value || "";
+        const nq = norm(query);
+        if (!nq) {
+          resBox.innerHTML = "";
+          return;
+        }
+        const matches = items.filter((it) => norm(it.label).includes(nq));
+        render(matches, query);
+      }
+      q.addEventListener("input", doSearch);
+
+      /* زر الإغلاق */
+      document
+        .getElementById("btnClose")
+        .addEventListener("click", function () {
+          try {
+            parent.postMessage("extMenu:close", "*");
+          } catch (e) {}
+        });
+    </script>
+  </body>
+</html>
