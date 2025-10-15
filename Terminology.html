@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>قاموس المصطلحات</title>
+<style>
+html,body{height:100%;margin:0;padding:0;font-family: 'DIN Next LT Arabic', sans-serif;direction: rtl;background:none;color:#222;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+.panel{position:relative;max-width:980px;margin:auto;height: 100vh;background:#fff;border-radius:6px;border:1px solid #e0e0e0;box-shadow:0 6px 18px rgba(0,0,0,0.08);overflow:hidden}
+.panel header{height: 50px; display:flex;justify-content:space-between;background:linear-gradient(90deg,#0f6670,#1aa0a5);color:#fff;font-size:20px;font-weight:600}
+.panel header span{padding:9px 18px}
+.close-btn{width:60px;background:#2aa6a6;color:#fff;border:none;font-size:40px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s}
+.close-btn:hover{background:#c9302c}
+.search{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:14px 18px;
+  background:#fafafa;
+  direction: rtl;
+}
+.search label {
+  font-weight: 600;
+  color: #0f6670;
+  white-space: nowrap;
+}
+.search input[type="search"]{flex:1;padding:10px 12px;border:3px solid #ccd0d4;border-radius:4px;background:#fff;direction:rtl}
+.list-wrapper{display:flex;align-items:stretch;gap:12px;padding:12px 18px 24px 18px;direction:ltr}
+.list{flex:1;max-height:70vh;overflow:auto;padding-right:8px;direction:rtl;scroll-behavior:auto;-ms-overflow-style:none;scrollbar-width:none}
+.list::-webkit-scrollbar{display:none}
+.term{background: #f9f9f9; border:1px solid #e6e6e6;padding:12px;margin-bottom:12px;border-radius:4px;background:#fff}
+
+/* تعديل العنوان لإضافة الخط والسهم */
+.term h4 {
+  position: relative;
+  margin: 0 0 6px 0;
+  font-size: 16px;
+  color: #0b5c60;
+  display: inline-block; /* لجعل العرض حسب المحتوى */
+  border-bottom: 1px solid #ccc; /* الخط الخفيف تحت العنوان */
+  padding-bottom: 4px; /* مسافة بين النص والخط */
+}
+
+.term h4::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-top: 2px solid #0b5c60;
+  border-right: 2px solid #0b5c60;
+  transform: rotate(-135deg);
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+.term p{margin:0;color:#444;line-height:1.6}
+.v-scroll{display:flex;flex-direction:column;align-items:center;gap:8px;padding:8px 0;user-select:none;width:16px}
+.v-scroll button{width:20px;height:20px;border-radius:50%;border:none;background:#388494;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 4px rgba(0,0,0,0.1);transition:background .2s;padding:0}
+.v-scroll button:hover{background:#336c87}
+.v-track{flex:1;width:4px;background:#d3d3d3;border-radius:2px;position:relative;display:flex;align-items:flex-start}
+.v-track .thumb{width:10px;height:10px;background:#808080;border-radius:50%;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.2);transition:background .15s,transform .15s;position:absolute;left:50%;transform:translateX(-50%)}
+.v-track .thumb:active{background:#666666;transform:translateX(-50%) scale(1.1)}
+.no-select{user-select:none!important}
+.panel header span{margin-left:580px}
+.term-icon-btn{width:60px;height:50px;background:#2aa6a6;color:#fff;border:none;font-size:40px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s}
+.term-icon-btn img{width:40px;height:40px}
+.term-icon-btn:hover{background:#c9302c}
+@media(max-width:600px){.panel{margin:12px}.panel header{font-size:18px}.v-scroll{display:none}.list{max-height:50vh}.close-btn{width:50px}.term-icon-btn{width:50px}}
+</style>
+</head>
+<body>
+<div class="panel" role="region" aria-label="قاموس المصطلحات">
+<header>
+    <button class="term-icon-btn" id="termIconBtn" aria-label="عرض المصطلحات">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M7 17v-10l5 2v10z" />
+            <line x1="7" y1="7" x2="12" y2="9" />
+            <line x1="12" y1="9" x2="12" y2="17" />
+            <path d="M12 9l5-2v10l-5 2z" />
+            <line x1="17" y1="7" x2="17" y2="17" />
+        </svg>
+    </button>
+    <span>قاموس المصطلحات</span>
+    <button class="close-btn" id="closeBtn" aria-label="إغلاق">×</button>
+</header>
+<div class="search">
+  <label for="q">ابحث عن المصطلح:</label>
+  <input type="search" placeholder="أدخل كلمة الحث هنا ..." aria-label="بحث عن المصطلح" id="q">
+  <button type="button" aria-label="ابحث">🔍</button>
+</div>
+<div class="list-wrapper">
+<div class="v-scroll" aria-hidden="true">
+    <button id="scroll-up" title="أعلى">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="18 15 12 9 6 15"></polyline>
+        </svg>
+    </button>
+    <div class="v-track" id="vtrack" aria-hidden="true">
+        <div class="thumb" id="vthumb" role="slider" aria-orientation="vertical" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+    </div>
+    <button id="scroll-down" title="أسفل">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+    </button>
+</div>
+<div class="list" id="terms" tabindex="0" aria-live="polite" aria-label="قائمة المصطلحات">
+<div class="term"><h4>استبانة جودة الخدمة</h4><p>SERVQUAL (Service Quality Scale)</p></div>
+<div class="term"><h4>مؤشر صافي الترويج</h4><p>NPS (Net Promoter Score)</p></div>
+<div class="term"><h4>مؤشرات الأداء الرئيسية</h4><p>KPIs (Key Performance Indicators)</p></div>
+<div class="term"><h4>الواقع الافتراضي</h4><p>VR (Virtual Reality)</p></div>
+<div class="term"><h4>الواقع المعزز</h4><p>AR (Augmented Reality)</p></div>
+<div class="term"><h4>إنترنت الأشياء</h4><p>IoT (Internet of Things)</p></div>
+</div>
+</div>
+</div>
+<script>
+(function(){
+const list=document.getElementById('terms');
+const track=document.getElementById('vtrack');
+const thumb=document.getElementById('vthumb');
+const upBtn=document.getElementById('scroll-up');
+const downBtn=document.getElementById('scroll-down');
+const searchInput=document.getElementById('q');
+const closeBtn=document.getElementById('closeBtn');
+const termIconBtn = document.getElementById('termIconBtn');
+const SCROLL_SPEED=8,SCROLL_DELAY=30;let scrollTimer=null;
+function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
+function updateThumb(){const contentH=list.scrollHeight,viewH=list.clientHeight,trackH=track.clientHeight;if(!contentH||contentH<=viewH||trackH===0){thumb.style.display='none';upBtn.disabled=true;downBtn.disabled=true;thumb.setAttribute('aria-valuenow',0);return}thumb.style.display='';upBtn.disabled=false;downBtn.disabled=false;const maxTop=trackH-thumb.clientHeight,ratio=list.scrollTop/(contentH-viewH),top=Math.round(maxTop*(isFinite(ratio)?ratio:0));thumb.style.top=top+'px';thumb.setAttribute('aria-valuenow',Math.round(ratio*100))}
+list.addEventListener('scroll',updateThumb);window.addEventListener('resize',updateThumb);
+function startScrolling(d){stopScrolling();scrollTimer=setInterval(()=>{list.scrollBy({top:d*SCROLL_SPEED,behavior:'auto'})},SCROLL_DELAY)}
+function stopScrolling(){if(scrollTimer){clearInterval(scrollTimer);scrollTimer=null}}
+upBtn.addEventListener('mousedown',()=>startScrolling(-1));upBtn.addEventListener('mouseup',stopScrolling);upBtn.addEventListener('mouseleave',stopScrolling);
+downBtn.addEventListener('mousedown',()=>startScrolling(1));downBtn.addEventListener('mouseup',stopScrolling);downBtn.addEventListener('mouseleave',stopScrolling);
+upBtn.addEventListener('touchstart',e=>{e.preventDefault();startScrolling(-1)});upBtn.addEventListener('touchend',stopScrolling);
+downBtn.addEventListener('touchstart',e=>{e.preventDefault();startScrolling(1)});downBtn.addEventListener('touchend',stopScrolling);
+let dragging=false,startY=0,startTop=0;
+thumb.addEventListener('pointerdown',ev=>{ev.preventDefault();dragging=true;startY=ev.clientY;startTop=parseInt(thumb.style.top||'0',10)||0;document.body.classList.add('no-select');thumb.setPointerCapture?.(ev.pointerId)});
+document.addEventListener('pointermove',ev=>{if(!dragging)return;const dy=ev.clientY-startY,trackH=track.clientHeight,thumbH=thumb.clientHeight,maxTop=trackH-thumbH,newTop=clamp(startTop+dy,0,maxTop);thumb.style.top=newTop+'px';const ratio=maxTop===0?0:newTop/maxTop;list.scrollTop=ratio*(list.scrollHeight-list.clientHeight)});
+document.addEventListener('pointerup',ev=>{if(dragging){dragging=false;document.body.classList.remove('no-select');try{ev.target&&ev.target.releasePointerCapture?.(ev.pointerId)}catch{}}});
+(function(){const terms=Array.from(document.querySelectorAll('.term'));let debounceTimer=null;function filter(q){const s=q.trim().toLowerCase();terms.forEach(el=>{const title=el.querySelector('h4')?.textContent?.toLowerCase()||'',body=el.querySelector('p')?.textContent?.toLowerCase()||'',match=title.includes(s)||body.includes(s);el.style.display=(s===''||match)?'':'none'});requestAnimationFrame(updateThumb)}searchInput.addEventListener('input',()=>{clearTimeout(debounceTimer);debounceTimer=setTimeout(()=>filter(searchInput.value),140)});document.querySelector('.search button').addEventListener('click',()=>searchInput.focus())})();
+requestAnimationFrame(updateThumb);const mo=new MutationObserver(()=>{requestAnimationFrame(updateThumb)});mo.observe(list,{childList:true,subtree:true,characterData:true,attributes:true});
+closeBtn.addEventListener('click', () => {
+  try {
+    if (window.parent !== window) {
+      window.parent.postMessage('extMenu:close', '*');
+    } else if (window.opener && !window.opener.closed) {
+      window.close();
+    } else {
+      history.back();
+    }
+  } catch (e) {
+    history.back();
+  }
+});
+termIconBtn.addEventListener('click', () => {
+    list.scrollTo({ top: 0, behavior: 'smooth' });
+});
+})();
+</script>
+</body>
+</html>
